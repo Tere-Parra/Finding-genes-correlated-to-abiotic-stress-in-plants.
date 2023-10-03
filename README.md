@@ -18,7 +18,9 @@ Here we use WGCNA to find correlated genes in multiple abiotic stress in plants.
    
 6) Water stress and heat stress combination (WS + HS)
     
-7) The combination of water stress, high light, and heat stress.
+7) The combination of water stress, high light, and heat stress (WS +HL +HS).
+
+8) Control (CT)
 
 Therefore, it is reasonable to expect that genes that cluster together in co-expressed modules within the WGCNA analysis would have some similarity in their function or regulation, as they are similarly expressed under these stress conditions. However, due to the conditions, it is expected to find gene modules that overlap to some extent, but there are also significant differences in gene expression between conditions. Also, it is important to consider both gene modules that are common to various conditions and those that are specific to the combinations.
 
@@ -27,7 +29,7 @@ In summary, it is likely to find co-expressed genes in the different abiotic str
  ## About the data 
 The count data and metadata were taken from: Damián Balfagón, Zandalinas, S. I., dos, T., Claudete Santa‐Catarina, & Gómez‐Cadenas, A. (2022). Reduction of heat stress pressure and activation of photosystem II repairing system are crucial for citrus tolerance to multiple abiotic stress combinations. Physiologia Plantarum, 174(6). https://doi.org/10.1111/ppl.13809 and from the Gene Expression Omnibus Data (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE203331) 
 
-The data contains 48 samples in total with 3 biological replicates for each stress condition. You can find the GDC data here (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE203331)
+The data contains 48 samples with 6 biological replicates for each stress condition. You can find the GDC data here (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE203331)
 
 ## Methods
 First and foremost, we are going to use the following libraries:
