@@ -36,19 +36,170 @@ First and foremost, we are going to use the following libraries:
 
 ''' R
 library(WGCNA);
+
 library(tidyverse);
+
 library(CorLevelPlot);
+
 library(gridExtra);
+
 library(DESeq2);
+
 library(apeglm);
-library(ggplot2);        
-library(dynamicTreeCut);   
-library(flashClust);        
-library(lattice);          
-library(survival);          
+
+library(ggplot2);  
+
+library(dynamicTreeCut);  
+
+library(flashClust);  
+
+library(lattice);  
+
+library(survival); 
+
 library(Hmisc); 
+
 library(vsn);
+
 library(GEOquery);
+
+
+# Allowing only two threads (consult WGCNA packages for more information)
+
+allowWGCNAThreads(2);
+ALLOW_WGCNA_THREADS = 2;  
+
+# Initial variables 
+options(stringsAsFactors = FALSE);    # indicates whether strings in a data frame should be treated as factor variables or as just plain strings
+enableWGCNAThreads(2)
+
+#############################################################################################################################################################
+#####################                  DATA MODIFICATION                   ##################################################################################
+#############################################################################################################################################################
+
+data <- read.table("counts.txt", header=TRUE, sep="\t")
+
+#Delete columns we will not use
+colnames(data)
+
+data <- filter( data, Type=="protein_coding")
+#12 658 coding genes
+
+data <- select(data, -Feature_GID, -Feature_TID, -Type, -Gene_Symbol,
+               -Gene_Synonym, -Protein_ID, -Product)
+
+data <- data[, 1:49]
+
+
+
+#Now we have the count data
+
+########### Obtain meta-data ####################
+
+#Load GEO Data Query metadata 
+
+query <-getGEO("GSE203331", GSEMatrix = TRUE)
+
+#Obtain matrix metadata
+metadata <-pData(phenoData(query[[1]]))
+
+#Let's Change samples names
+colnames(metadata)
+
+#1) Select samples name, geo_accession and treatment information
+metadata <- select(metadata, c("title", "treatment:ch1"))
+
+
+# 2) change samples name for data sample names
+
+#assign data samples names to nuevos_nombres
+
+nuevos_nombres <- as.vector(colnames(data)[2:49])
+
+
+# To the metadata$title names 
+metadata$title <- nuevos_nombres
+
+#Apply the change
+metadata$title <- colnames(data)[2:49]
+
+
+#Test the correct names position 
+print(nuevos_nombres)
+
+names <- as.data.frame(nuevos_nombres)
+
+phenodata <- data.frame(
+  treatment = c("Control", "Control", "Control", "Control", "Control", "Control", 
+                "High light and heat stress combination", "High light and heat stress combination", 
+                "High light and heat stress combination", "High light and heat stress combination", 
+                "High light", "High light", "High light", "High light", "High light", "High light", 
+                "High light and heat stress combination", "High light and heat stress combination", 
+                "Heat stress", "Heat stress", "Heat stress", "Heat stress", "Heat stress", "Heat stress", 
+                "Water stress and high light combination", "Water stress and high light combination", 
+                "Water stress and high light combination", "Water stress and high light combination", 
+                "Water stress and high light combination", 
+                "Water stress and heat stress combination", "Water stress and heat stress combination", 
+                "Water stress and heat stress combination", "Water stress and heat stress combination", 
+                "Water stress and heat stress combination", "Water stress and heat stress combination", 
+                "Water stress", "Water stress", "Water stress", "Water stress", "Water stress", "Water stress", 
+                "Water stress and high light combination", 
+                "Water stress, high light and heat stress combination", 
+                "Water stress, high light and heat stress combination", 
+                "Water stress, high light and heat stress combination", 
+                "Water stress, high light and heat stress combination", 
+                "Water stress, high light and heat stress combination", 
+                "Water stress, high light and heat stress combination")
+  
+  
+)
+
+# some samples name dont match very well 
+metadata <- cbind(names, metadata, phenodata)
+colnames(metadata)
+
+#Now we have the same samples names
+new_data <- select(metadata, "nuevos_nombres", "treatment")
+
+#Now let's prepare the binary metadata 
+
+
+traits <- new_data %>% 
+  mutate(treatment = ifelse(grepl('Control', treatment), 1, 0))  
+  
+
+new_data$treatment <- factor(new_data$treatment , 
+                                              levels = c("Control",
+                                                        "High light and heat stress combination",
+                                                        "High light",
+                                                        "Heat stress",
+                                                        "Water stress and high light combination",
+                                                        "Water stress and heat stress combination",
+                                                        "Water stress",
+                                                        "Water stress, high light and heat stress combination"))
+
+severity.out_1 <- binarizeCategoricalColumns(new_data$treatment,
+                                           includePairwise = FALSE,
+                                           includeLevelVsAll = TRUE,
+                                           minCount = 1)
+
+#Join both data frames
+PhenoData <- cbind( traits, severity.out_1)
+
+colnames(PhenoData)
+
+Pheno <- rownames_to_column(PhenoData)
+PhenoData <- Pheno[,2:9]
+
+
+#PhenoData <- PhenoData %>%
+           #column_to_rownames(var='nuevos_nombres')
+
+save(data, PhenoData,file="matrix_data.RData")    
+load("matrix_data.RData")
+
+
+
 
 ''' 
 
