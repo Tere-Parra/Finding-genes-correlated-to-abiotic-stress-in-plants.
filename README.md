@@ -4,7 +4,7 @@
 
 Weighted Correlation Network Analysis (WGCNA) can be used for finding clusters (modules) of highly correlated genes, summarizing such groups using the module eigengene or intramodular hub genes, for relating modules to one another and external sample traits, and calculating module membership measures. It is a type of analysis based on correlation coefficients between different samples. The correlation coefficient is the closest relationship that presents two variables, this is measured in Pearson, Spearman, and Kendal (Chengcheng et al., 2022; Sahai et al., 2018). It is used to evaluate gene expression patterns, where those most similar to each other are grouped into a module. This relationship also allows associating characteristics, as genes concentrated in a module may be involved in the same biological process or signaling pathway.
 
-Here we use WGCNA to find correlated genes in multiple abiotic stress in plants. We test seven different stress treatments in citrus plants:
+Here we use WGCNA to find correlated genes in multiple abiotic stress in plants (Cleopatra Mandarin and Carrizo citrange). We test seven different stress treatments in citrus plants:
 
 1) Water stress (WS)
    
