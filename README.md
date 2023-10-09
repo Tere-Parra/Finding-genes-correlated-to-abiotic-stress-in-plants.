@@ -34,33 +34,20 @@ The data contains 48 samples with 6 biological replicates for each stress condit
 ## Methods
 First and foremost, we are going to use the following libraries:
 
-''' R
+ ``` R
 library(WGCNA);
-
 library(tidyverse);
-
 library(CorLevelPlot);
-
 library(gridExtra);
-
 library(DESeq2);
-
 library(apeglm);
-
 library(ggplot2);  
-
 library(dynamicTreeCut);  
-
 library(flashClust);  
-
 library(lattice);  
-
 library(survival); 
-
 library(Hmisc); 
-
 library(vsn);
-
 library(GEOquery);
 
 
@@ -89,7 +76,6 @@ data <- select(data, -Feature_GID, -Feature_TID, -Type, -Gene_Symbol,
                -Gene_Synonym, -Protein_ID, -Product)
 
 data <- data[, 1:49]
-
 
 
 #Now we have the count data
@@ -198,6 +184,7 @@ PhenoData <- Pheno[,2:9]
 save(data, PhenoData,file="matrix_data.RData")    
 load("matrix_data.RData")
 
+ ``` 
 
 
 
