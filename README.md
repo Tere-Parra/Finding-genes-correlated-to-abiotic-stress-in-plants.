@@ -686,6 +686,18 @@ Annotation <- Annotation[1:8]
 
 Now we can use the genes in this module for future analysis and to visualize the relationship they have with water stress. 
 
+## How to interpret these results? 
+
+However, gene expression patterns refer to the tendency of certain genes to increase or decrease their expression simultaneously in response to a particular stimulus or condition. In the context of WS, these patterns could indicate that genes related to water stress tend to be turned on or off together in plants subjected to this condition.  Notably, more analysis is still needed as to why the other conditions did not provide a similarity of simultaneously expressed genes. This could be due to the diversity of genes that could act on more than one stress condition. What would be expected to be genes that act in the response to water stress are different from the genes that act in irradiation as shown in the image: "module traits for plant abiotic stress". And if we are more observant we will also see that both the irradiation column (3) and the column with the heat trait (4), show almost the same modules with GS>0.50.  
+
+Further analysis would also be needed in the conditions of WS (column 7) and WS+HL (column 5), where similarities are shown in the gene modules acting under these conditions. 
+
+Therefore, this type of analysis can provide valuable information about how genes are regulated and coordinated to stressors such as water limitation. 
+
+I now hope that this analysis and its applications have become clearer and can be replicated in other studies. 
+
+
+
 ## Acknowledgment
 Tere Parra (2023). GitHub. [https://github.com/Tere-Parra/Finding-genes-correlated-to-abiotic-stress-in-plants.]
 
