@@ -578,8 +578,8 @@ labeledHeatmap(Matrix= moduleTraitCor2,
 
 ![](Module_Trait.png)
 
-Now that we have associated traits with modules, it is necessary to understand whether this association is really meaningful. For this, WGCNA quantifies the individual associations with our traits of interest through the GS parameter (gene significance). For each module defines a quantitative measure of belonging to that module (MM, correlation between the eigene module and the gene expression profile) allowing to quantify the similarity of all the genes of the matrix with each module. 
-Therefore, it is expected that it is not necessary to evaluate all modules for all traits if they turn out to be non-significant. 
+Now that we have associated traits with modules, it is necessary to understand whether this association is really meaningful. For this, WGCNA quantifies the individual associations with our traits of interest through the GS parameter (gene significance). Each module defines a quantitative measure of belonging to that module (MM, correlation between the eigene module and the gene expression profile) allowing to quantify the similarity of all the genes of the matrix with each module.  Therefore, it is expected that it is not necessary to evaluate all modules for all traits if they turn out to be non-significant. 
+
 Observing the generated heatmap, we can see that traits such as "High light and heat strees" and "toilet stress", obtained values above 0.5 correlation, so it would be interesting to evaluate their significance (traits) in the modules indicated. 
 
 
