@@ -21,6 +21,7 @@ Here we use WGCNA to find correlated genes in multiple abiotic stress in plants 
 8) Control (CT)
 
 Therefore, it is reasonable to expect that genes that cluster together in co-expressed modules within the WGCNA analysis would have some similarity in their function or regulation, as they are similarly expressed under these stress conditions. However, due to the conditions, it is expected to find gene modules that overlap to some extent, but there are also significant differences in gene expression between conditions. Also, it is important to consider both gene modules that are common to various conditions and those that are specific to the combinations.
+
 In summary, it is likely to find co-expressed genes in the different abiotic stress conditions, which would suggest similarities in the gene response to these conditions. However, accurate interpretation of the results will require further analysis and consideration of the underlying biology of the experimental conditions being studied.
 
  ## About the data 
@@ -32,8 +33,11 @@ The WGCA package has three different ways to perform network construction and mo
 1) An automatic detection of the construction of the network and its modules. This way is convenient for those people who seek to reach a result with minimal effort or with limited computational tools. 
 2) A step-by-step construction of the network and module detection. Using this option it is possible to manage and choose our own parameters for the generation of the network and modules. It is also characteristic of not-so-large volumes of expression data. 
 3) An automatic way to build block networks and module detection. Special for extremely large gene expression data. It is important to emphasize that this step requires the user to have available multiple cores and a graphical interface with R.  
-In this tutorial we build on step 2) to build the network.  In this tutorial, I will present the necessary steps before starting with network construction and module discovery. 
+In this tutorial we build on step 2) to build the network.
+
+In this tutorial, I will present the necessary steps before starting with network construction and module discovery. 
 To do this, we will need the packages listed below, to also allow the management of certain cores available on our PC. If you are working from your laptop I recommend you first check the configuration of how many cores your processor handles. In general, it is recommended to use 4 cores, however, I will use only 2. Another step before starting is to use the function (stringsAsFactors = FALSE) in R, which is convenient for handling data frames. R, automatically indicates that matrices should be treated as factorial variables, which can cause your data not to load properly when building or importing it. Therefore, if you do not implement this step your columns containing characters (text) become factors. 
+
 After the construction of the network, we will identify highly related modules and assign them to the phenotypic traits of abiotic stress. We will test whether the associations between gene expression and traits are significant and perform a more in-depth analysis with those modules that are statistically significant.  
 
  ``` R
@@ -278,24 +282,24 @@ boxplot(rld_mat_wt,outline=FALSE, main="After Stabilization", show_colnames = TR
 With the heatmap and the hclust we can visualize that the biological samples coincide and are not so far from each other. Therefore, we can continue with the analysis without removing any of the samples. 
 
 Next, we will perform the first WGCA step for the construction of the network. In this step we will build a weighted gene network, for this we will have to choose a threshold potential that corresponds to the similarity of co-expression. The pickSoftThreshold function helps to perform network topology analysis and choose the appropriate similarity.  This first step is vital and we must rely on the best statistical interpretation obtained. 
+
 In total we will have the following indices: 
 
-$fitIndices
-   Power SFT.R.sq slope truncated. R.sq mean.k.  median.k.max.k.
+   **Power, SFT.R.sq, slope truncated,  R.sq mean.k,  median.k.max.k**
 
-Where Powers is the choice of how to visualize the data, in this case we select that we want the results in 30 clusters. So it will show us from 1 to 30 the statistics. It is also the potency that is being evaluated. This is used to transform the gene expression matrix into a similarity matrix that will be used to build the co-expression network.
+**Powers** is the choice of how to visualize the data, in this case we select that we want the results in 30 clusters. So it will show us from 1 to 30 the statistics. It is also the potency that is being evaluated. This is used to transform the gene expression matrix into a similarity matrix that will be used to build the co-expression network.
 
-Sft.R.sq measures variation in the similarity matrix, so it can explain the relationships between genes. A high value indicates a better power adjustment and therefore a more precise network.
+**Sft.R.sq** measures variation in the similarity matrix, so it can explain the relationships between genes. A high value indicates a better power adjustment and therefore a more precise network.
 
-Slope: Presents the slope of the curve. It is used to see how Sft.R.sq increases as the power changes. A high value suggests that Sft.R.sq increases rapidly, i.e. it has an effective potency. It is also important to determine when our network stabilizes. 
+**Slope:** Presents the slope of the curve. It is used to see how Sft.R.sq increases as the power changes. A high value suggests that Sft.R.sq increases rapidly, i.e. it has an effective potency. It is also important to determine when our network stabilizes. 
 
-Truncated.R.sa: Determines whether the power is high enough to capture relevant co-expression relationships
+**Truncated.R.sa** Determines whether the power is high enough to capture relevant co-expression relationships
 
-Mean.k (k mean): Average degree of nodes in the coexpression network built with the specified power. Therefore, it is the connection number that a gene has in the network. The higher, the denser a network would be.
+**Mean.k (k mean):** Average degree of nodes in the coexpression network built with the specified power. Therefore, it is the connection number that a gene has in the network. The higher, the denser a network would be.
 
-Median.k: Median degree of nodes in the coexpression network constructed with the specified power. Like the middle k, the median k is the number of connections of a gene in the network (number of genes at that node)
+**Median.k** Median degree of nodes in the coexpression network constructed with the specified power. Like the middle k, the median k is the number of connections of a gene in the network (number of genes at that node)
 
-Mx.k: maximum degree of network nodes. How connected is the gene to the network? 
+**Mx.k:** maximum degree of network nodes. How connected is the gene to the network? 
 
 
 
