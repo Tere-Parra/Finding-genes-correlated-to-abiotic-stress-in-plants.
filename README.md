@@ -661,4 +661,42 @@ verboseScatterplot(abs(geneModuleMembership[moduleGenes, column]),
 
 ![](water_stress.png)
 
+
+
+These results indicate that water stress has a significant feature on both species (it is important to mention that each of the other traits was also evaluated with its module, where the genetic significance was GS>0.50 for each trait evaluated).  
+
+A total of 61 genes associated with the red module were found that were significant to water stress.  
+With the total number of genes obtained in a new matrix and the initial counting table, the genes were written down to see their functions.  
+
+
+``` R
+ colnames(norm.counts)  
+norm.counts[1:5,1:5]# these are all genes included in the analysis
+
+#All genes include in the red module
+genes.red <- as.data.frame(colnames(norm.counts)[moduleColors=="red"])
+print(genes.red)
+#we change the column name to entrez gene ID
+colnames(genes.red) <- "Entrez_Gene_ID"
+
+#We match the genes with the original data count
+annotation <- merge(genes.red, data, by="Entrez_Gene_ID")
+Annotation <- Annotation[1:8]
+```
+
+Now we can use the genes in this module for future analysis and to visualize the relationship they have with water stress. 
+
+## Acknowledgment
+Tere Parra (2023). GitHub. [https://github.com/Tere-Parra/Finding-genes-correlated-to-abiotic-stress-in-plants.]
+
+
+## References
+
+•	B. Zhang and S. Horvath. A general framework for weighted gene co-expression network analysis. Statistical Applications in Genetics and Molecular Biology, 4(1): Article 17, 2005
+
+•	Damián Balfagón, Zandalinas, S. I., dos, T., Claudete Santa‐Catarina, & Gómez‐Cadenas, A. (2022). Reduction of heat stress pressure and activation of photosystem II repairing system are crucial for citrus tolerance to multiple abiotic stress combination. Physiologia Plantarum, 174(6). https://doi.org/10.1111/ppl.13809
+
+•	Langfelder, P., & Horvath, S. (2008). WGCNA: an R package for weighted correlation network analysis. BMC Bioinformatics, 9(1). https://doi.org/10.1186/1471-2105-9-559
+
+
 ‌
