@@ -187,7 +187,7 @@ colnames(PhenoData)
 
 #Verify the number of columns 
 Pheno <- rownames_to_column(PhenoData)
-PhenoData <- Pheno[,2:9]
+PhenoData <- Pheno[,2:10]
 
 #Save R session
 save(data, PhenoData,file="matrix_data. RData")    
