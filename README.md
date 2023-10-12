@@ -278,6 +278,10 @@ plot(htree)
 boxplot(rld_mat_wt,outline=FALSE, main="After Stabilization", show_colnames = TRUE,
         xaxt="n")
  ``` 
+![Sample Distribution](sample_distribution.jpg)
+
+![Dendogram](dendogram.png)
+
 
 With the heatmap and the hclust we can visualize that the biological samples coincide and are not so far from each other. Therefore, we can continue with the analysis without removing any of the samples. 
 
