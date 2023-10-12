@@ -345,10 +345,12 @@ abline(h=160,col="red");
 #We need to select the SoftPower number where the Scale-free topology is more stable. 
 softPower = 28;
  ```
+![](Rplot01.png)
 
 As can be seen in the results of the table and in the graphs from power number 28 the network reaches a stabilization and a higher threshold, so we chose that number. 
+
 The next step is to calculate an adjacency matrix and TOM dissimilarity. The adjacency matrix serves to represent the similarity between genes in the co-expression network. Genes with high similarity are connected. On the other hand, TOM dissimilarity measures topological dissimilarity between genes in the network. These calculations help identify gene modules that are strongly connected. The modules to be calculated later are sets of genes that tend to express themselves together and may be involved in related biological pathways or processes. 
-Other functions involve selecting threshold parameters and checking significance and then performing functional analysis of co-expression modules. 
+Other functions involve selecting threshold parameters checking significance and then performing functional analysis of co-expression modules. 
 
  ``` R
 
@@ -374,7 +376,9 @@ save(TOM,dissTOM, softPower,adjacency, file="DissTOM.RData")
 load("DissTOM.RData")
  ```
 
-Now we will obtain the modules and each module is automatically assigned by WGCNA to a certain color. Where the gray color represents genes that were not assigned to any module.  WGCNA asks you for a minimum of modules you want to generate, then assigns the genes to a module, and depending on the parameters as if you choose to cut to a certain similarity (cutHeight) it will generate a number of modules that will be assigned to a color. 
+Now we will obtain the modules and each module is automatically assigned by WGCNA to a certain color. Where the gray color represents genes that were not assigned to any module.  
+
+WGCNA asks you for a minimum of modules you want to generate, then assigns the genes to a module, and depending on the parameters as if you choose to cut to a certain similarity (cutHeight) it will generate a number of modules that will be assigned to a color. 
 
  ``` R
 ################################################################################
@@ -413,6 +417,7 @@ plotDendroAndColors(geneTree, dynamicColors, "Dynamic Tree Cut",
 
 save(dynamicMods, dynamicColors, geneTree, file="DynamicMods.RData")
  ```
+![](TOM diss.png)
 
 Now that we have modules assigned to certain colors, we need to identify modules whose expression profile is very similar. This can be done by merging modules and quantifying similarity. To obtain a similarity cut, the DynamicTreeCut function is used, and moduleEigengenes is used to quantify the similarity based on its correlation. 
 
@@ -449,6 +454,7 @@ plot(METree, main= "Clustering of module eigengenes",
 
 abline(h=0.50,col="red");
  ```
+![](Color_dendogram.png)
 
 The next step is optional and will depend on whether you have many modules. If for example you have 30 or more modules it may be necessary to merge them to obtain a smaller number. This will depend on your own analysis. 
 
@@ -569,6 +575,8 @@ labeledHeatmap(Matrix= moduleTraitCor2,
                main= paste("Module-trait for Plant Abiotic Stress"))
 
  ```
+
+![](Module_Trait.png)
 
 Now that we have associated traits with modules, it is necessary to understand whether this association is really meaningful. For this, WGCNA quantifies the individual associations with our traits of interest through the GS parameter (gene significance). For each module defines a quantitative measure of belonging to that module (MM, correlation between the eigene module and the gene expression profile) allowing to quantify the similarity of all the genes of the matrix with each module. 
 Therefore, it is expected that it is not necessary to evaluate all modules for all traits if they turn out to be non-significant. 
