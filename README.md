@@ -583,9 +583,68 @@ Now that we have associated traits with modules, it is necessary to understand w
 Observing the generated heatmap, we can see that traits such as "High light and heat strees" and "toilet stress", obtained values above 0.5 correlation, so it would be interesting to evaluate their significance (traits) in the modules indicated. 
 
 
+ ``` R
+#### Significative Clusters ####
+
+# Significative values 
+MEs0 = moduleEigengenes(norm.counts, moduleColors)$eigengenes
+MEs = orderMEs(MEs0)
+moduleTraitCor = cor(MEs, norm.counts, use = "p");
+moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples)
+
+# P-value and correlation 
+textMatrix = paste(signif(moduleTraitCor, 2), " (",
+                   signif(moduleTraitPvalue, 1), ")", sep = "");
+dim(textMatrix) = dim(moduleTraitCor)
+dim(PhenoData)
+
+#############   Intramodular analysis #######
+
+###Water stress
+Water_stress = as.data.frame(PhenoData$`data.Water stress.vs.all`);
+names(Water_stress) = "Water Stress";
+
+# Name of the modules ###
+modNames = substring(names(MEs), 3);
+geneModuleMembership = as.data.frame(cor(norm.counts, MEs, use = "p"));        
+MMPvalue = as.data.frame(corPvalueStudent(as.matrix(geneModuleMembership), nSamples));#Calculates Student asymptotic p-value for given correlations
+names(geneModuleMembership) = paste("MM", modNames, sep="");
+names(MMPvalue) = paste("p.MM", modNames, sep="");
+geneTraitSignificance = as.data.frame(cor(norm.counts, Water_stress, use = "p"));
+
+GSPvalue = as.data.frame(corPvalueStudent(as.matrix(geneTraitSignificance), nSamples));
+names(geneTraitSignificance) = paste("GS.", names(Water_stress), sep="");
+names(GSPvalue) = paste("p.GS.", names(Water_stress), sep="");
+
+############## GS y MM  ##############
+sizeGrWindow(7, 7);
+par(mfrow = c(1, 2))
+
+####    High correlated color modules
+module = "salmon"
+module = "red"
+
+column = match(module, modNames);
+moduleGenes = moduleColors == module;
+
+# Left panel
+verboseScatterplot(abs(geneModuleMembership[moduleGenes, column]),
+                   abs(geneTraitSignificance[moduleGenes, 1]),
+                   xlab = paste("MM in", module, "module"),
+                   ylab = "Water stress",
+                   main = paste("Module membership vs. gene significance\n"),
+                   cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = module)
+# Right panel
+verboseScatterplot(abs(geneModuleMembership[moduleGenes, column]),
+                   abs(geneTraitSignificance[moduleGenes, 1]),
+                   xlab = paste("MM in", module, "module"),
+                   ylab = "water stress",
+                   cex.main = 1, cex.lab = 1, cex.axis = 1, col = module,
+                   abline.color = 1)'''
+
+```
 
 
-
-
+![](water_stress.png)
 
 ‌
