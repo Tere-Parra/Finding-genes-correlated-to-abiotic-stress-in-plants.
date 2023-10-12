@@ -305,6 +305,276 @@ In total we will have the following indices:
 
 **Mx.k:** maximum degree of network nodes. How connected is the gene to the network? 
 
+ ``` R
+##########################################################################################################
+###### ANALYSIS OF SCALE FREE TOPOLOGY FOR SOFT-THRESHOLDING
+     
+##########################################################################################################
+ #We pick up 30
+powers = c(c(1:10), seq(from =10, to=30, by=1)); 
+
+sft = pickSoftThreshold(norm.counts,
+                        dataIsExpr = TRUE,
+                        powerVector = powers,
+                        corFnc = cor, # cor=Pearson correlation 
+                        corOptions = list(use = 'p'), 
+                        verbose = 5, # Number of words print during the analysis
+                        networkType = "signed"); # "unsigned", "signed", "signed hybrid"
+
+write.table(sft, "results_SFT_corr.txt")
+
+# Plot the results
+sizeGrWindow(5, 5)
+PAR(MFROW = C(1,2));     
+cex1 = 1 # 0.9; #Letter number 
+# Scale-free topology fit index as a function of the soft-threshold power
+plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],xlab="Soft Threshold (power)",
+     ylab="Scale Free Topology",
+     type="n", main = paste("Scale independence for \n Cleopatra"));
+text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],labels=powers,cex=cex1,col="red");
+
+# Red line corresponds to using an R^2 cut-off
+ abline(h=0.70, col="red");  
+ 
+# Mean connectivity as a function of the soft-threshold power
+plot(sft$fitIndices[,1], sft$fitIndices[,5],xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n",main = paste("Mean connectivity"))
+text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
+
+abline(h=160,col="red");
+
+#We need to select the SoftPower number where the Scale-free topology is more stable. 
+softPower = 28;
+ ```
+
+As can be seen in the results of the table and in the graphs from power number 28 the network reaches a stabilization and a higher threshold, so we chose that number. 
+The next step is to calculate an adjacency matrix and TOM dissimilarity. The adjacency matrix serves to represent the similarity between genes in the co-expression network. Genes with high similarity are connected. On the other hand, TOM dissimilarity measures topological dissimilarity between genes in the network. These calculations help identify gene modules that are strongly connected. The modules to be calculated later are sets of genes that tend to express themselves together and may be involved in related biological pathways or processes. 
+Other functions involve selecting threshold parameters and checking significance and then performing functional analysis of co-expression modules. 
+
+ ``` R
+
+################################################################################
+#### Generating adjacency and TOM based on the selected soft power
+#############################################################################################
+#Calculate the adjacency matrix
+adjacency = adjacency(norm.counts,type = "signed",   
+                     power = softPower);
+head(adjacency)
+
+# translate the adjacency into TOM and calculate the corresponding dissimilarity
+# this action minimize the effects of noise and spurious associations
+
+TOM = TOMsimilarityFromExpr(adjacency,                         
+                          TOMType = "signed", 
+                          power = softPower);
+
+dissTOM = 1-TOM
+
+save(TOM,dissTOM, softPower,adjacency, file="DissTOM.RData")
+
+load("DissTOM.RData")
+ ```
+
+Now we will obtain the modules and each module is automatically assigned by WGCNA to a certain color. Where the gray color represents genes that were not assigned to any module.  WGCNA asks you for a minimum of modules you want to generate, then assigns the genes to a module, and depending on the parameters as if you choose to cut to a certain similarity (cutHeight) it will generate a number of modules that will be assigned to a color. 
+
+ ``` R
+################################################################################
+    ##### Module identification using dynamic tree cut 
+################################################################################
+## Set the minimum module size, I will select 20
+minModuleSize = 20;
+diff(geneTree$height)
+
+## We chose dissTOM for this analysis because all genes are assigned to some module 
+dynamicMods = cutreeDynamic(dendro= geneTree, 
+                            distM = dissTOM,   
+                            deepSplit=2,   
+                            pamRespectsDendro= FALSE,     
+                            minClusterSize = minModuleSize)
+
+## when cutHeight not given, for method=="tree" it defaults to 0.99, for method=="hybrid" it ##defaults to 99% of the range between the 5th percentile and the maximum of the joining heights ## on the dendrogram
+
+table(dynamicMods)
+write.table(table(dynamicMods), file = "results_dynamicMods.txt", sep = ",", quote = FALSE, row.names = F)
+
+# Convert numeric labels into colors
+dynamicColors = labels2colors(dynamicMods)      
+sort(table(dynamicColors), decreasing = TRUE)  
+#24 diff colors 
+
+write.table(sort(table(dynamicColors), decreasing = TRUE), file = "results_dynamicColors.txt", sep = ",", quote = FALSE, row.names = F)
+
+# Plot the dendrogram and colors underneath
+sizeGrWindow(8,6)
+plotDendroAndColors(geneTree, dynamicColors, "Dynamic Tree Cut",
+                    dendroLabels = FALSE, hang = 0.05,
+                    addGuide = TRUE, guideHang = 0.1,
+                    cex.main = 1,
+                    main = "Gene dendrogram and Module Colors")
+
+save(dynamicMods, dynamicColors, geneTree, file="DynamicMods.RData")
+ ```
+
+Now that we have modules assigned to certain colors, we need to identify modules whose expression profile is very similar. This can be done by merging modules and quantifying similarity. To obtain a similarity cut, the DynamicTreeCut function is used, and moduleEigengenes is used to quantify the similarity based on its correlation. 
+
+ ``` R
+##### Merging of modules whose expression profiles are very similar
+################################################################################
+
+# Calculate eigengenes 
+MEList= moduleEigengenes(norm.counts, colors= dynamicColors,
+                         excludeGrey = TRUE,
+                         softPower = softPower)
+# Here are the ME tables by color module
+MEs = MEList$eigengenes
+
+# Calculate dissimilarity of module eigengenes
+MEDiss = 1-cor(MEs)     
+     
+# Cluster module eigengenes
+METree = hclust(as.dist(MEDiss),method= "average")
+
+save(MEs, MEDiss, METree, file= "Module_Identification.RData")
+load("Module_Identification.RData")
+
+# Clustering of module eigengenes visualization
+sizeGrWindow(6,14)
+
+## plots tree showing how the eigengenes cluster together
+plot(METree, main= "Clustering of module eigengenes", 
+     cex.main = 1.2,
+     xlab= "", #col.lab="red", cex.lab=1.5,
+     ylab = "",
+     cex = 0.5, #labels = FALSE
+     sub= "");   #cex.main = 1, cex.lab = 1, cex.axis = 1    
+
+abline(h=0.50,col="red");
+ ```
+
+The next step is optional and will depend on whether you have many modules. If for example you have 30 or more modules it may be necessary to merge them to obtain a smaller number. This will depend on your own analysis. 
+
+In case it is not necessary to merge your modules, choose a MEDissThres=0.0.  This statistic is a threshold used to define when two modules are considered correlated with each other. This value is set taking into account the following logic: if the dissimilarity between two modules is less than the selected threshold, they are considered correlated and would be grouped as a set of related modules. Therefore, it is a measure of how much difference you are willing to accept between the modules before considering that they are related. 
+
+Next, I will not apply a strict merge for my modules, since I only have 24, but it is recommended that before performing this step you verify how different your modules obtained in the previous step are and whether or not it is worth merging them.
+
+By merging them you will notice that the assigned colors are reduced and others are maintained.
+
+ ``` R
+#######  ################################################################################
+
+## We choose a height cut of 0.00
+MEDissThres = 0.00
+
+## Plot the cut line into the dendrogram
+abline(h=MEDissThres, col = "red")
+## Call an automatic merging function
+merge = mergeCloseModules(norm.counts, dynamicColors, 
+                          cutHeight= MEDissThres, 
+                          verbose =3)
+merge$dendro
+merge$oldDendro
+merge$newMEs
+
+## The merged module colors
+mergedColors = merge$colors
+
+## Eigengenes of the new merged modules
+mergedMEs = merge$newMEs
+mergedMEs$MEblack[1:5]
+
+length(mergedMEs)   
+sort(table(mergedColors), decreasing = TRUE)
+write.table(sort(table(mergedColors), decreasing = TRUE), file = "mergedColors.txt", sep = ",", quote = FALSE, row.names = F)
+
+## plot dendrogram with module colors 
+plotDendroAndColors(geneTree, main= "Clustering of MEs", 
+                    cbind(dynamicColors, mergedColors), 
+                    c("Dynamic Tree Cut", "Merged dynamic"), 
+                    dendroLabels = FALSE, 
+                    cex.main = 1,
+                    hang=0.03, addGuide= TRUE, 
+                    guideHang=0.05)
+
+# Reaassign the new variables to the old one 
+moduleColors = mergedColors
+
+# Construct numerical labels corresponding to the colors
+colorOrder = c("grey", standardColors(50));   # standardColors(50)
+moduleLabels = match(mergedColors, colorOrder)-1 # moduleColors
+MEs = mergedMEs
+
+save(MEs, moduleLabels, moduleColors, file= "MergedMods.RData")
+load("MergedMods.RData.RData")
+ ```
+
+Just like the graph above allows you to see which modules were merged. Also, it is possible to graph the TOM matrix through TOMplot, to see the difference between the modules that have been merged. Just keep in mind that graphing TOM, can take a long time and is a bit heavy. So take your time to wait (approximately 20 minutes). 
+
+ ``` R
+sort(table(mergedColors), decreasing = TRUE)
+#set the DIAGONAL of the dissimilarity to NA 
+diag(dissTOM) = NA;
+
+TOMplot(dissTOM,
+        geneTree,
+        as.character(mergedColors[mergedColors]),
+        ColorsLeft = mergedColors,
+        terrainColors = TRUE,
+        main = "TOM graphic");
+  ```
+
+Now that we have the modules that are highly related to each other, we can associate these modules with the traits (metadata) we choose about abiotic stress in the plant. 
+
+ ``` R
+##### Correlating treats 
+################################################################################
+
+# Define the number of genes and samples
+nGenes = ncol(norm.counts)
+nSamples = nrow(norm.counts)
+## Recalculate MEs with color labels.   
+MEs0 = moduleEigengenes(norm.counts, moduleColors)$eigengenes  
+MEs = orderMEs(MEs0)
+
+
+# Link the external values to the correlation matrix
+PhenoData <- PhenoData %>%
+             column_to_rownames(var="nuevos_nombres")
+moduleTraitCor2 = cor(MEs, PhenoData, use= "p")
+
+# Calculates Student asymptotic p-value for given correlations.
+moduleTraitPvalue2 = corPvalueStudent(moduleTraitCor2, nSamples)   
+
+# Print correlation and p-value heatmap between modules and traits
+#textMatrix2= paste(signif(moduleTraitCor2, 2), " (", signif(moduleTraitPvalue2, 1), ")", sep= "")
+
+# Print just the correlation heatmap between modules and traits.
+textMatrix2= paste(signif(moduleTraitCor2, 2))
+dim(textMatrix2) = dim(moduleTraitCor2)
+sizeGrWindow(9, 12)
+PAR(Mar= C(3.5, 10, 2, 1))
+
+# Display the corelation values with a heatmap
+labeledHeatmap(Matrix= moduleTraitCor2,
+               #xLabels= names(datTraits2),
+               xLabels= names(PhenoData),
+               yLabels = names(MEs),
+               yLabelsPosition = "left",
+               yColorWidth = 0.1,
+               cex.lab.y = 0.8,
+               cex.lab.x = 0.7,
+               ySymbols= names(MEs),
+               colors= blueWhiteRed(50), 
+               textMatrix= (textMatrix2),
+               setStdMargins= FALSE,
+               cex.text= 0.6,
+               main= paste("Module-trait for Plant Abiotic Stress"))
+
+ ```
+
+Now that we have associated traits with modules, it is necessary to understand whether this association is really meaningful. For this, WGCNA quantifies the individual associations with our traits of interest through the GS parameter (gene significance). For each module defines a quantitative measure of belonging to that module (MM, correlation between the eigene module and the gene expression profile) allowing to quantify the similarity of all the genes of the matrix with each module. 
+Therefore, it is expected that it is not necessary to evaluate all modules for all traits if they turn out to be non-significant. 
+Observing the generated heatmap, we can see that traits such as "High light and heat strees" and "toilet stress", obtained values above 0.5 correlation, so it would be interesting to evaluate their significance (traits) in the modules indicated. 
+
+
 
 
 
