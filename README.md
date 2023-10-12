@@ -37,7 +37,8 @@ The data contains 48 samples with 6 biological replicates for each stress condit
 
 In this analysis, we took the counting data and metadata to be able to associate the different types of stress with the gene expression of both plant species.  Through this analysis, it was observed that four modules involved in water stress (WH) and water stress combined with irradiation (WS + HL) were shared. 
 
-It was also found that modules such as irradiation with the combination of heat (HL + HS), irradiation (HL), and heat stress (HS), were modules that were associated with plant stress.  
+It was also found that modules such as irradiation with the combination of heat (HL + HS), irradiation (HL), and heat stress (HS), were modules that were associated with plant stress.
+
 Of all the associated traits, WH was significant for both species.  That could mean that this is a relevant trait related to gene co-expression patterns, while other factors did not show such strong correlations with genes.  This suggests that in the dataset the other stresses do not appear to be strongly associated and this could be due to the nature of the data, the sample, the biological context, or the intensity of the effects of each factor on gene expression.  Therefore, this study provides information on the type of stress that could have a more prominent role in the regulation of gene expression in citrus. 
 
 
