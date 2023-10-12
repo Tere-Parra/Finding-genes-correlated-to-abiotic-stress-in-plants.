@@ -24,9 +24,22 @@ Therefore, it is reasonable to expect that genes that cluster together in co-exp
 
 In summary, it is likely to find co-expressed genes in the different abiotic stress conditions, which would suggest similarities in the gene response to these conditions. However, accurate interpretation of the results will require further analysis and consideration of the underlying biology of the experimental conditions being studied.
 
+ ## About the paper 
+ 
+The analysis carried out by Santa‐Catarina, & Gómez‐Cadenas, A. (2022), aimed to study the effect of abiotic stress combinations on the photosynthetic apparatus of two citrus genotypes, Carrizo citrange and Cleopatra mandarina.  Their study showed that the plants were able to increase the expression of genes and proteins related to photosystem repair. 
+
  ## About the data 
+ 
 The count data and metadata were taken from: Damián Balfagón, Zandalinas, S. I., dos, T., Claudete Santa‐Catarina, & Gómez‐Cadenas, A. (2022). Reduction of heat stress pressure and activation of photosystem II repairing system are crucial for citrus tolerance to multiple abiotic stress combinations. Physiologia Plantarum, 174(6). https://doi.org/10.1111/ppl.13809 and from the Gene Expression Omnibus Data (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE203331) 
 The data contains 48 samples with 6 biological replicates for each stress condition. You can find the GDC data here (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE203331)
+
+## About this analysis 
+
+In this analysis, we took the counting data and metadata to be able to associate the different types of stress with the gene expression of both plant species.  Through this analysis, it was observed that four modules involved in water stress (WH) and water stress combined with irradiation (WS + HL) were shared. 
+
+It was also found that modules such as irradiation with the combination of heat (HL + HS), irradiation (HL), and heat stress (HS), were modules that were associated with plant stress.  
+Of all the associated traits, WH was significant for both species.  That could mean that this is a relevant trait related to gene co-expression patterns, while other factors did not show such strong correlations with genes.  This suggests that in the dataset the other stresses do not appear to be strongly associated and this could be due to the nature of the data, the sample, the biological context, or the intensity of the effects of each factor on gene expression.  Therefore, this study provides information on the type of stress that could have a more prominent role in the regulation of gene expression in citrus. 
+
 
 ## Methods
 The WGCA package has three different ways to perform network construction and module discovery. 
