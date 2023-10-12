@@ -36,7 +36,7 @@ In this tutorial we build on step 2) to build the network.  In this tutorial, I 
 To do this, we will need the packages listed below, to also allow the management of certain cores available on our PC. If you are working from your laptop I recommend you first check the configuration of how many cores your processor handles. In general, it is recommended to use 4 cores, however, I will use only 2. Another step before starting is to use the function (stringsAsFactors = FALSE) in R, which is convenient for handling data frames. R, automatically indicates that matrices should be treated as factorial variables, which can cause your data not to load properly when building or importing it. Therefore, if you do not implement this step your columns containing characters (text) become factors. 
 After the construction of the network, we will identify highly related modules and assign them to the phenotypic traits of abiotic stress. We will test whether the associations between gene expression and traits are significant and perform a more in-depth analysis with those modules that are statistically significant.  
 
- ''' R
+ ``` R
 #Libraries we are going to use
 library(WGCNA);
 library(tidyverse);
@@ -61,11 +61,11 @@ ALLOW_WGCNA_THREADS = 2;
 Options (stringsAsFactors = FALSE);
 enableWGCNAThreads(2)
 
-'''
+ ``` 
 
 Subsequently, we will modify our data in such a way that the names of the samples of the counting data are the same as in the metadata. Because our data coming from the GEO Database is not fixed to start the analysis. We will have to modify them and then analyze their gene expression. 
 
-''' R
+ ``` R
 #############################################################################################################################################################
 ##### DATA MODIFICATION                   ##################################################################################
 #############################################################################################################################################################
@@ -151,11 +151,11 @@ colnames(metadata)
 
 #Now we have the same samples names
 new_data <- select(metadata, "nuevos_nombres", "treatment")
-'''
+ ``` 
 
 Now that we have modified the count and metadata data to work with WGCA, it is also necessary to modify the metadata and convert it to a binary array with the metadata.  This matrix will allow WGCNA to identify which metadata comes from which sample. For example, not all samples are heat stress, with the matrix with binary data it will be marked with 1 if that sample is heat stress and 0, otherwise. Therefore, it is expected to have a column with the samples and other columns with each of the stress conditions in the plant. 
 
-''' R
+ ``` R
 #Now let's prepare the binary metadata, first we are going to binarize control 
 traits <- new_data%>% 
   mutate(treatment = ifelse(grepl('Control', treatment), 1, 0))  
@@ -189,10 +189,11 @@ PhenoData <- Pheno[,2:9]
 save(data, PhenoData,file="matrix_data. RData")    
 load("matrix_data. RData")
 
- '''
+  ```
+
 Now we have the metadata modified for WGCNA, in the same way we have to make the recommendations of WGCNA with the counting data. According to the library, it is necessary to do a variance stabilization with the Deseq2 package before starting with the creation of the network and identification of modules.  This step is known as gene expression analysis and will serve to verify that the samples are not too dispersed and can harm the analysis, also to eliminate genes with very low counts. Specifically, WGCNA suggests a cleansing of the count and sample data prior to variance stabilization. 
 
-''' R
+ ``` R
 ##############################################################
 ####### Gene Expression Analysis ############
 
@@ -272,7 +273,7 @@ plot(htree)
 #We can see the application of the variance over the samples with a boxplot 
 boxplot(rld_mat_wt,outline=FALSE, main="After Stabilization", show_colnames = TRUE,
         xaxt="n")
-'''
+ ``` 
 
 With the heatmap and the hclust we can visualize that the biological samples coincide and are not so far from each other. Therefore, we can continue with the analysis without removing any of the samples. 
 
