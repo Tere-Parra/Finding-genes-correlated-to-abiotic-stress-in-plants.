@@ -87,13 +87,13 @@ Subsequently, we will modify our data in such a way that the names of the sample
 #############################################################################################################################################################
 ##### DATA MODIFICATION                   ##################################################################################
 #############################################################################################################################################################
-#Import count data (you can download from the GEO page)
+#Import count data (you can download it from the GEO page)
 data <- read.table("counts.txt", header=TRUE, sep="\t")
 
 #Delete columns we will not use
 colnames(data)
 
-#We are going to use only the genes protein coding.  
+#We are going to use only the gene protein-coding.  
 data <- filter( data, Type=="protein_coding")
 #12 658 coding genes
 
@@ -113,15 +113,15 @@ query <-getGEO("GSE203331", GSEMatrix = TRUE)
 #Obtain matrix metadata
 metadata <-pData(phenoData(query[[1]]))
 
-#Let's Change samples names
+#Let's Change sample names
 colnames(metadata)
 
-#1) Select samples name, geo_accession and treatment information.
+#1) Select samples name, geo_accession, and treatment information.
 metadata <- select(metadata, c("title", "treatment:CH1"))
 
-#2) Change samples name for data sample names
+#2) Change sample names for data sample names
 
-#assign data samples names to nuevos_nombres
+#assign data sample names to nuevos_nombres
 
 nuevos_nombres <- as.vector(colnames(data)[2:49])
 
@@ -174,7 +174,7 @@ new_data <- select(metadata, "nuevos_nombres", "treatment")
 Now that we have modified the count and metadata data to work with WGCA, it is also necessary to modify the metadata and convert it to a binary array with the metadata.  This matrix will allow WGCNA to identify which metadata comes from which sample. For example, not all samples are heat stress, with the matrix with binary data it will be marked with 1 if that sample is heat stress and 0, otherwise. Therefore, it is expected to have a column with the samples and other columns with each of the stress conditions in the plant. 
 
  ``` R
-#Now let's prepare the binary metadata, first we are going to binarize control 
+#Now let's prepare the binary metadata, we are going to binarize the control 
 traits <- new_data%>% 
   mutate(treatment = ifelse(grepl('Control', treatment), 1, 0))  
   
@@ -209,7 +209,7 @@ load("matrix_data. RData")
 
   ```
 
-Now we have the metadata modified for WGCNA, in the same way we have to make the recommendations of WGCNA with the counting data. According to the library, it is necessary to do a variance stabilization with the Deseq2 package before starting with the creation of the network and identification of modules.  This step is known as gene expression analysis and will serve to verify that the samples are not too dispersed and can harm the analysis, also to eliminate genes with very low counts. Specifically, WGCNA suggests a cleansing of the count and sample data prior to variance stabilization. 
+Now we have the metadata modified for WGCNA, in the same way, we have to make the recommendations of WGCNA with the counting data. According to the library, it is necessary to do a variance stabilization with the Deseq2 package before starting with the creation of the network and identification of modules.  This step is known as gene expression analysis and will serve to verify that the samples are not too dispersed and can harm the analysis, and also to eliminate genes with very low counts. Specifically, WGCNA suggests a cleansing of the count and sample data prior to variance stabilization. 
 
  ``` R
 ##############################################################
@@ -377,7 +377,7 @@ adjacency = adjacency(norm.counts,type = "signed",
 head(adjacency)
 
 # translate the adjacency into TOM and calculate the corresponding dissimilarity
-# this action minimize the effects of noise and spurious associations
+# This action minimizes the effects of noise and spurious associations
 
 TOM = TOMsimilarityFromExpr(adjacency,                         
                           TOMType = "signed", 
@@ -431,7 +431,7 @@ plotDendroAndColors(geneTree, dynamicColors, "Dynamic Tree Cut",
 
 save(dynamicMods, dynamicColors, geneTree, file="DynamicMods.RData")
  ```
-![](TOM diss.png)
+![](TOM.png)
 
 Now that we have modules assigned to certain colors, we need to identify modules whose expression profile is very similar. This can be done by merging modules and quantifying similarity. To obtain a similarity cut, the DynamicTreeCut function is used, and moduleEigengenes is used to quantify the similarity based on its correlation. 
 
@@ -470,9 +470,9 @@ abline(h=0.50,col="red");
  ```
 ![](Color_dendogram.png)
 
-The next step is optional and will depend on whether you have many modules. If for example you have 30 or more modules it may be necessary to merge them to obtain a smaller number. This will depend on your own analysis. 
+The next step is optional and will depend on whether you have many modules. If for example, you have 30 or more modules it may be necessary to merge them to obtain a smaller number. This will depend on your own analysis. 
 
-In case it is not necessary to merge your modules, choose a MEDissThres=0.0.  This statistic is a threshold used to define when two modules are considered correlated with each other. This value is set taking into account the following logic: if the dissimilarity between two modules is less than the selected threshold, they are considered correlated and would be grouped as a set of related modules. Therefore, it is a measure of how much difference you are willing to accept between the modules before considering that they are related. 
+In case it is not necessary to merge your modules, choose MEDissThres=0.0.  This statistic is a threshold used to define when two modules are considered correlated with each other. This value is set taking into account the following logic: if the dissimilarity between two modules is less than the selected threshold, they are considered correlated and would be grouped as a set of related modules. Therefore, it is a measure of how much difference you are willing to accept between the modules before considering that they are related. 
 
 Next, I will not apply a strict merge for my modules, since I only have 24, but it is recommended that before performing this step you verify how different your modules obtained in the previous step are and whether or not it is worth merging them.
 
@@ -572,7 +572,7 @@ dim(textMatrix2) = dim(moduleTraitCor2)
 sizeGrWindow(9, 12)
 PAR(Mar= C(3.5, 10, 2, 1))
 
-# Display the corelation values with a heatmap
+# Display the correlation values with a heatmap
 labeledHeatmap(Matrix= moduleTraitCor2,
                #xLabels= names(datTraits2),
                xLabels= names(PhenoData),
@@ -634,7 +634,7 @@ names(GSPvalue) = paste("p.GS.", names(Water_stress), sep="");
 sizeGrWindow(7, 7);
 par(mfrow = c(1, 2))
 
-####    High correlated color modules
+####    High-correlated color modules
 module = "salmon"
 module = "red"
 
@@ -671,9 +671,9 @@ With the total number of genes obtained in a new matrix and the initial counting
 
 ``` R
  colnames(norm.counts)  
-norm.counts[1:5,1:5]# these are all genes included in the analysis
+norm.counts[1:5,1:5]# These are all genes included in the analysis
 
-#All genes include in the red module
+#All genes are included in the red module
 genes.red <- as.data.frame(colnames(norm.counts)[moduleColors=="red"])
 print(genes.red)
 #we change the column name to entrez gene ID
@@ -706,7 +706,7 @@ Tere Parra (2023). GitHub. [https://github.com/Tere-Parra/Finding-genes-correlat
 
 •	B. Zhang and S. Horvath. A general framework for weighted gene co-expression network analysis. Statistical Applications in Genetics and Molecular Biology, 4(1): Article 17, 2005
 
-•	Damián Balfagón, Zandalinas, S. I., dos, T., Claudete Santa‐Catarina, & Gómez‐Cadenas, A. (2022). Reduction of heat stress pressure and activation of photosystem II repairing system are crucial for citrus tolerance to multiple abiotic stress combination. Physiologia Plantarum, 174(6). https://doi.org/10.1111/ppl.13809
+•	Damián Balfagón, Zandalinas, S. I., dos, T., Claudete Santa‐Catarina, & Gómez‐Cadenas, A. (2022). Reduction of heat stress pressure and activation of photosystem II repairing system are crucial for citrus tolerance to multiple abiotic stress combinations. Physiologia Plantarum, 174(6). https://doi.org/10.1111/ppl.13809
 
 •	Langfelder, P., & Horvath, S. (2008). WGCNA: an R package for weighted correlation network analysis. BMC Bioinformatics, 9(1). https://doi.org/10.1186/1471-2105-9-559
 
